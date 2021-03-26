@@ -16,8 +16,6 @@ using Microsoft.Net.Http.Headers;
 
 namespace CefSharp.AspNetCore.Mvc
 {
-    using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
-
     /// <summary>
     /// OWIN feature collection.
     /// </summary>
