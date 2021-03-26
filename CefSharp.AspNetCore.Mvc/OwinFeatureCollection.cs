@@ -37,7 +37,6 @@ namespace CefSharp.AspNetCore.Mvc
         /// </summary>
         public IDictionary<string, object> Environment { get; set; }
         private PipeWriter _responseBodyWrapper;
-        private bool _headersSent;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Microsoft.AspNetCore.Owin.OwinFeatureCollection"/>.
@@ -46,13 +45,6 @@ namespace CefSharp.AspNetCore.Mvc
         public OwinFeatureCollection(IDictionary<string, object> environment)
         {
             Environment = environment;
-
-            var register = Prop<Action<Action<object>, object>>(CommonKeys.OnSendingHeaders);
-            register?.Invoke(state =>
-            {
-                var collection = (OwinFeatureCollection)state;
-                collection._headersSent = true;
-            }, this);
         }
 
         T Prop<T>(string key)
@@ -174,7 +166,7 @@ namespace CefSharp.AspNetCore.Mvc
 
         bool IHttpResponseFeature.HasStarted
         {
-            get { return _headersSent; }
+            get { return false; }
         }
 
         void IHttpResponseFeature.OnStarting(Func<object, Task> callback, object state)
@@ -249,41 +241,14 @@ namespace CefSharp.AspNetCore.Mvc
             set { throw new NotSupportedException(); }
         }
 
-        private bool SupportsInterface(Type key)
-        {
-            // Does this type implement the requested interface?
-            if (key.IsAssignableFrom(GetType()))
-            {
-                // Check for conditional features
-                if (key == typeof(ITlsConnectionFeature))
-                {
-                    return false;
-                }
-                else if (key == typeof(IHttpWebSocketFeature))
-                {
-                    return false;
-                }
-
-                // The rest of the features are always supported.
-                return true;
-            }
-            return false;
-        }
-
         /// <inheritdoc/>
         public object Get(Type key)
         {
-            if (SupportsInterface(key))
+            if (key.IsAssignableFrom(GetType()))
             {
                 return this;
             }
             return null;
-        }
-
-        /// <inheritdoc/>
-        public void Set(Type key, object value)
-        {
-            throw new NotSupportedException();
         }
 
         /// <inheritdoc/>
@@ -572,13 +537,11 @@ namespace CefSharp.AspNetCore.Mvc
 
     internal static class CommonKeys
     {
-        public const string ClientCertificate = "ssl.ClientCertificate";
         public const string RemoteIpAddress = "server.RemoteIpAddress";
         public const string RemotePort = "server.RemotePort";
         public const string LocalIpAddress = "server.LocalIpAddress";
         public const string LocalPort = "server.LocalPort";
         public const string ConnectionId = "server.ConnectionId";
-        public const string OnSendingHeaders = "server.OnSendingHeaders";
         public const string Scheme = "scheme";
         public const string Host = "host";
         public const string Port = "port";
