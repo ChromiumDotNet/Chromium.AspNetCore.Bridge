@@ -211,13 +211,9 @@ namespace CefSharp.AspNetCore.Mvc
 
         Task IHttpResponseBodyFeature.SendFileAsync(string path, long offset, long? length, CancellationToken cancellation)
         {
-            object obj;
-            if (Environment.TryGetValue(SendFiles.SendAsync, out obj))
-            {
-                var func = (SendFileFunc)obj;
-                return func(path, offset, length, cancellation);
-            }
-            throw new NotSupportedException(SendFiles.SendAsync);
+            var writer = ((IHttpResponseBodyFeature)this).Writer;
+
+            return SendFileFallback.SendFileAsync(writer.AsStream(), path, offset, length, cancellation);
         }
 
         // IFeatureCollection
@@ -546,19 +542,6 @@ namespace CefSharp.AspNetCore.Mvc
         public const string Host = "host";
         public const string Port = "port";
         public const string Path = "path";
-    }
-
-    internal static class SendFiles
-    {
-        // 3.1. Startup
-
-        public const string Version = "sendfile.Version";
-        public const string Support = "sendfile.Support";
-        public const string Concurrency = "sendfile.Concurrency";
-
-        // 3.2. Per Request
-
-        public const string SendAsync = "sendfile.SendAsync";
     }
 }
 
