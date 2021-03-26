@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace CefSharp.AspNetCore.Mvc.Example.Wpf
@@ -22,18 +23,22 @@ namespace CefSharp.AspNetCore.Mvc.Example.Wpf
             settings.CachePath = Path.Combine(Path.GetDirectoryName(typeof(App).Assembly.Location), "cache");
             Cef.Initialize(settings);
 
-            var builder = new WebHostBuilder();
+            _ = Task.Run(async () =>
+              {
+                  var builder = new WebHostBuilder();
 
-            builder.ConfigureServices(services =>
-            {
-                services.AddSingleton<IServer, OwinServer>();
-            });
+                  builder.ConfigureServices(services =>
+                  {
+                      services.AddSingleton<IServer, OwinServer>();
+                  });
 
-            _host = builder
-                .UseStartup<Startup>()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .Build();
-            _host.RunAsync();
+                  _host = builder
+                      .UseStartup<Startup>()
+                      .UseContentRoot(Directory.GetCurrentDirectory())
+                      .Build();
+
+                  await _host.RunAsync();
+              });            
         }
 
         protected override void OnExit(ExitEventArgs e)
