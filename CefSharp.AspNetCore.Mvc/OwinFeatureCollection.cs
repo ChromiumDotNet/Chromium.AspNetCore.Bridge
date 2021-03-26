@@ -18,40 +18,6 @@ namespace CefSharp.AspNetCore.Mvc
 {
     using SendFileFunc = Func<string, long, long?, CancellationToken, Task>;
 
-    internal static class CommonKeys
-    {
-        public const string ClientCertificate = "ssl.ClientCertificate";
-        public const string LoadClientCertAsync = "ssl.LoadClientCertAsync";
-        public const string RemoteIpAddress = "server.RemoteIpAddress";
-        public const string RemotePort = "server.RemotePort";
-        public const string LocalIpAddress = "server.LocalIpAddress";
-        public const string LocalPort = "server.LocalPort";
-        public const string ConnectionId = "server.ConnectionId";
-        public const string TraceOutput = "host.TraceOutput";
-        public const string Addresses = "host.Addresses";
-        public const string AppName = "host.AppName";
-        public const string Capabilities = "server.Capabilities";
-        public const string OnSendingHeaders = "server.OnSendingHeaders";
-        public const string OnAppDisposing = "host.OnAppDisposing";
-        public const string Scheme = "scheme";
-        public const string Host = "host";
-        public const string Port = "port";
-        public const string Path = "path";
-    }
-
-    internal static class SendFiles
-    {
-        // 3.1. Startup
-
-        public const string Version = "sendfile.Version";
-        public const string Support = "sendfile.Support";
-        public const string Concurrency = "sendfile.Concurrency";
-
-        // 3.2. Per Request
-
-        public const string SendAsync = "sendfile.SendAsync";
-    }
-
     /// <summary>
     /// OWIN feature collection.
     /// </summary>
@@ -62,7 +28,6 @@ namespace CefSharp.AspNetCore.Mvc
         IHttpResponseBodyFeature,
         IHttpConnectionFeature,
         IHttpRequestIdentifierFeature,
-        IHttpRequestLifetimeFeature,
         IOwinEnvironmentFeature
     {
         
@@ -263,17 +228,6 @@ namespace CefSharp.AspNetCore.Mvc
             throw new NotSupportedException(SendFiles.SendAsync);
         }
 
-        CancellationToken IHttpRequestLifetimeFeature.RequestAborted
-        {
-            get { return Prop<CancellationToken>(OwinConstants.CallCancelled); }
-            set { Prop(OwinConstants.CallCancelled, value); }
-        }
-
-        void IHttpRequestLifetimeFeature.Abort()
-        {
-            throw new NotImplementedException();
-        }
-
         // IFeatureCollection
 
         /// <inheritdoc/>
@@ -357,7 +311,6 @@ namespace CefSharp.AspNetCore.Mvc
             yield return new KeyValuePair<Type, object>(typeof(IHttpResponseBodyFeature), this);
             yield return new KeyValuePair<Type, object>(typeof(IHttpConnectionFeature), this);
             yield return new KeyValuePair<Type, object>(typeof(IHttpRequestIdentifierFeature), this);
-            yield return new KeyValuePair<Type, object>(typeof(IHttpRequestLifetimeFeature), this);
             yield return new KeyValuePair<Type, object>(typeof(IOwinEnvironmentFeature), this);
         }
 
@@ -615,6 +568,34 @@ namespace CefSharp.AspNetCore.Mvc
             value = default(StringValues);
             return false;
         }
+    }
+
+    internal static class CommonKeys
+    {
+        public const string ClientCertificate = "ssl.ClientCertificate";
+        public const string RemoteIpAddress = "server.RemoteIpAddress";
+        public const string RemotePort = "server.RemotePort";
+        public const string LocalIpAddress = "server.LocalIpAddress";
+        public const string LocalPort = "server.LocalPort";
+        public const string ConnectionId = "server.ConnectionId";
+        public const string OnSendingHeaders = "server.OnSendingHeaders";
+        public const string Scheme = "scheme";
+        public const string Host = "host";
+        public const string Port = "port";
+        public const string Path = "path";
+    }
+
+    internal static class SendFiles
+    {
+        // 3.1. Startup
+
+        public const string Version = "sendfile.Version";
+        public const string Support = "sendfile.Support";
+        public const string Concurrency = "sendfile.Concurrency";
+
+        // 3.2. Per Request
+
+        public const string SendAsync = "sendfile.SendAsync";
     }
 }
 
