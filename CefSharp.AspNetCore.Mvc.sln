@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CefSharp.AspNetCore.Mvc", "CefSharp.AspNetCore.Mvc\CefSharp.AspNetCore.Mvc.csproj", "{9AD08B47-B8C3-40CF-847B-885AD09A105D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefSharp.AspNetCore.Mvc.Example.Wpf", "CefSharp.AspNetCore.Mvc.Example.Wpf\CefSharp.AspNetCore.Mvc.Example.Wpf.csproj", "{0F38BEF1-0A3D-4DFD-B0F6-02386DED78B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CefSharp.AspNetCore.Mvc.Example.Wpf", "CefSharp.AspNetCore.Mvc.Example.Wpf\CefSharp.AspNetCore.Mvc.Example.Wpf.csproj", "{0F38BEF1-0A3D-4DFD-B0F6-02386DED78B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebView2.AspNetCore.Mvc.Example.Wpf", "WebView2.AspNetCore.Mvc.Example.Wpf\WebView2.AspNetCore.Mvc.Example.Wpf.csproj", "{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{0F38BEF1-0A3D-4DFD-B0F6-02386DED78B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F38BEF1-0A3D-4DFD-B0F6-02386DED78B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F38BEF1-0A3D-4DFD-B0F6-02386DED78B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
