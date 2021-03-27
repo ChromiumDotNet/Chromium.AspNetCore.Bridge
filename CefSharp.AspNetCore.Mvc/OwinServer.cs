@@ -37,7 +37,7 @@ namespace CefSharp.AspNetCore.Mvc
         {
             AppFunc appFunc = async env =>
             {
-                var features = new FeatureCollection(new OwinFeatureCollection(env));
+                var features = new OwinFeatureCollection(env);
 
                 var context = application.CreateContext(features);
 
