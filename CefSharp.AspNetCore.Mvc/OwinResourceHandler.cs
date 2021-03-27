@@ -1,5 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Alex Maitland. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -9,7 +13,6 @@ namespace CefSharp.AspNetCore.Mvc
 {
     //Shorthand for Owin pipeline func
     using AppFunc = Func<IDictionary<string, object>, Task>;
-
 
     /// <summary>
     /// Loosly based on https://github.com/eVisionSoftware/Harley/blob/master/src/Harley.UI/Owin/OwinSchemeHandlerFactory.cs
@@ -79,7 +82,7 @@ namespace CefSharp.AspNetCore.Mvc
             //var cancellationTokenSource = new CancellationTokenSource();
             //var cancellationToken = cancellationTokenSource.Token;
             var uri = new Uri(request.Url);
-            var requestHeaders = request.Headers.ToDictionary();
+            var requestHeaders = ToDictionary(request.Headers);
             //Add Host header as per http://owin.org/html/owin.html#5-2-hostname
             requestHeaders.Add("Host", new[] { uri.Host + (uri.Port > 0 ? (":" + uri.Port) : "") });
 
@@ -185,6 +188,30 @@ namespace CefSharp.AspNetCore.Mvc
             });
 
             return CefReturnValue.ContinueAsync;
+        }
+
+        private static IDictionary<string, string[]> ToDictionary(NameValueCollection nameValueCollection)
+        {
+            var dict = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+            foreach (var key in nameValueCollection.AllKeys)
+            {
+                if (!dict.ContainsKey(key))
+                {
+                    dict.Add(key, new string[0]);
+                }
+                var strings = nameValueCollection.GetValues(key);
+                if (strings == null)
+                {
+                    continue;
+                }
+                foreach (string value in strings)
+                {
+                    var values = dict[key].ToList();
+                    values.Add(value);
+                    dict[key] = values.ToArray();
+                }
+            }
+            return dict;
         }
     }
 }

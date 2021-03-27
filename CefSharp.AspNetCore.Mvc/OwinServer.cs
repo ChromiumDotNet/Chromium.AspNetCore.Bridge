@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
+﻿// Copyright (c) Alex Maitland. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Features;
 using System;
 using System.Collections.Generic;
@@ -13,6 +16,7 @@ namespace CefSharp.AspNetCore.Mvc
     public class OwinServer : IServer
     {
         private IFeatureCollection _features = new FeatureCollection();
+        private Action<AppFunc> useOwin;
 
         IFeatureCollection IServer.Features
         {
@@ -24,10 +28,13 @@ namespace CefSharp.AspNetCore.Mvc
             
         }
 
+        public void UseOwin(Action<AppFunc> action)
+        {
+            useOwin = action;
+        }
+
         Task IServer.StartAsync<TContext>(IHttpApplication<TContext> application, CancellationToken cancellationToken)
         {
-            // Note that this example does not take into account of Nowin's "server.OnSendingHeaders" callback.
-            // Ideally we should ensure this method is fired before disposing the context. 
             AppFunc appFunc = async env =>
             {
                 var features = new FeatureCollection(new OwinFeatureCollection(env));
@@ -47,11 +54,9 @@ namespace CefSharp.AspNetCore.Mvc
                 application.DisposeContext(context, null);
             };
 
-            var requestContext = Cef.GetGlobalRequestContext();
-            requestContext.RegisterOwinSchemeHandlerFactory("https", "cefsharp.test", appFunc); 
+            useOwin?.Invoke(appFunc);
 
             return Task.CompletedTask;
-
         }
 
         Task IServer.StopAsync(CancellationToken cancellationToken)

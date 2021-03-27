@@ -29,7 +29,14 @@ namespace CefSharp.AspNetCore.Mvc.Example.Wpf
 
                   builder.ConfigureServices(services =>
                   {
-                      services.AddSingleton<IServer, OwinServer>();
+                      var server = new OwinServer();
+                      server.UseOwin(appFunc =>
+                      {
+                          var requestContext = Cef.GetGlobalRequestContext();
+                          requestContext.RegisterOwinSchemeHandlerFactory("https", "cefsharp.test", appFunc);
+                      });
+
+                      services.AddSingleton<IServer>(server);
                   });
 
                   _host = builder

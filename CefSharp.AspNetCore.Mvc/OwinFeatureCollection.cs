@@ -4,20 +4,19 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Pipelines;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using CefSharp.AspNetCore.Mvc.Owin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Owin;
-using Microsoft.Extensions.Primitives;
-using Microsoft.Net.Http.Headers;
 
 namespace CefSharp.AspNetCore.Mvc
 {
     /// <summary>
-    /// OWIN feature collection.
+    /// CefSharp OWIN feature collection.
+    /// A simplified <see cref="IFeatureCollection"/> that can be adapted directly in CefSharp (potentially other web browsers)
     /// </summary>
     public class OwinFeatureCollection :
         IFeatureCollection,
@@ -28,13 +27,13 @@ namespace CefSharp.AspNetCore.Mvc
         IHttpRequestIdentifierFeature,
         IOwinEnvironmentFeature
     {
-        
-
         /// <summary>
         /// Gets or sets OWIN environment values.
         /// </summary>
         public IDictionary<string, object> Environment { get; set; }
         private PipeWriter _responseBodyWrapper;
+        private IHeaderDictionary _requestHeaders;
+        private IHeaderDictionary _responseHeaders;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Microsoft.AspNetCore.Owin.OwinFeatureCollection"/>.
@@ -104,7 +103,15 @@ namespace CefSharp.AspNetCore.Mvc
 
         IHeaderDictionary IHttpRequestFeature.Headers
         {
-            get { return MakeHeaderDictionary(Prop<IDictionary<string, string[]>>(OwinConstants.RequestHeaders)); }
+            get
+            {
+                if(_requestHeaders == null)
+                {
+                    var dict = Prop<IDictionary<string, string[]>>(OwinConstants.RequestHeaders);
+                    _requestHeaders = dict is IHeaderDictionary ? (IHeaderDictionary)dict : new DictionaryStringValuesWrapper(dict);
+                }
+                return _requestHeaders;
+            }
             set { Prop(OwinConstants.RequestHeaders, MakeDictionaryStringArray(value)); }
         }
 
@@ -134,7 +141,15 @@ namespace CefSharp.AspNetCore.Mvc
 
         IHeaderDictionary IHttpResponseFeature.Headers
         {
-            get { return MakeHeaderDictionary(Prop<IDictionary<string, string[]>>(OwinConstants.ResponseHeaders)); }
+            get
+            {
+                if (_responseHeaders == null)
+                {
+                    var dict = Prop<IDictionary<string, string[]>>(OwinConstants.ResponseHeaders);
+                    _responseHeaders = dict is IHeaderDictionary ? (IHeaderDictionary)dict : new DictionaryStringValuesWrapper(dict);
+                }
+                return _responseHeaders;
+            }
             set { Prop(OwinConstants.ResponseHeaders, MakeDictionaryStringArray(value)); }
         }
 
@@ -231,30 +246,27 @@ namespace CefSharp.AspNetCore.Mvc
         /// <inheritdoc/>
         public object this[Type key]
         {
-            get { return Get(key); }
+            get
+            {
+                if (key.IsAssignableFrom(GetType()))
+                {
+                    return this;
+                }
+                return null;
+            }
             set { throw new NotSupportedException(); }
         }
 
         /// <inheritdoc/>
-        public object Get(Type key)
-        {
-            if (key.IsAssignableFrom(GetType()))
-            {
-                return this;
-            }
-            return null;
-        }
-
-        /// <inheritdoc/>
-        public TFeature Get<TFeature>()
+        TFeature IFeatureCollection.Get<TFeature>()
         {
             return (TFeature)this[typeof(TFeature)];
         }
 
         /// <inheritdoc/>
-        public void Set<TFeature>(TFeature instance)
+        void IFeatureCollection.Set<TFeature>(TFeature instance)
         {
-            this[typeof(TFeature)] = instance;
+            throw new NotSupportedException();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -324,16 +336,6 @@ namespace CefSharp.AspNetCore.Mvc
             return queryString;
         }
 
-        private static IHeaderDictionary MakeHeaderDictionary(IDictionary<string, string[]> dictionary)
-        {
-            var wrapper = dictionary as DictionaryStringArrayWrapper;
-            if (wrapper != null)
-            {
-                return wrapper.Inner;
-            }
-            return new DictionaryStringValuesWrapper(dictionary);
-        }
-
         private static IDictionary<string, string[]> MakeDictionaryStringArray(IHeaderDictionary dictionary)
         {
             var wrapper = dictionary as DictionaryStringValuesWrapper;
@@ -342,190 +344,6 @@ namespace CefSharp.AspNetCore.Mvc
                 return wrapper.Inner;
             }
             return new DictionaryStringArrayWrapper(dictionary);
-        }
-    }
-
-    internal class DictionaryStringValuesWrapper : IHeaderDictionary
-    {
-        public DictionaryStringValuesWrapper(IDictionary<string, string[]> inner)
-        {
-            Inner = inner;
-        }
-
-        public readonly IDictionary<string, string[]> Inner;
-
-        private KeyValuePair<string, StringValues> Convert(KeyValuePair<string, string[]> item) => new KeyValuePair<string, StringValues>(item.Key, item.Value);
-
-        private KeyValuePair<string, string[]> Convert(KeyValuePair<string, StringValues> item) => new KeyValuePair<string, string[]>(item.Key, item.Value);
-
-        private StringValues Convert(string[] item) => item;
-
-        private string[] Convert(StringValues item) => item;
-
-        StringValues IHeaderDictionary.this[string key]
-        {
-            get
-            {
-                string[] values;
-                return Inner.TryGetValue(key, out values) ? values : null;
-            }
-            set { Inner[key] = value; }
-        }
-
-        StringValues IDictionary<string, StringValues>.this[string key]
-        {
-            get { return Inner[key]; }
-            set { Inner[key] = value; }
-        }
-
-        public long? ContentLength
-        {
-            get
-            {
-                long value;
-
-                string[] rawValue;
-                if (!Inner.TryGetValue(HeaderNames.ContentLength, out rawValue))
-                {
-                    return null;
-                }
-
-                if (rawValue.Length == 1 &&
-                    !string.IsNullOrEmpty(rawValue[0]) &&
-                    HeaderUtilities.TryParseNonNegativeInt64(new StringSegment(rawValue[0]).Trim(), out value))
-                {
-                    return value;
-                }
-
-                return null;
-            }
-            set
-            {
-                if (value.HasValue)
-                {
-                    Inner[HeaderNames.ContentLength] = (StringValues)HeaderUtilities.FormatNonNegativeInt64(value.GetValueOrDefault());
-                }
-                else
-                {
-                    Inner.Remove(HeaderNames.ContentLength);
-                }
-            }
-        }
-
-        int ICollection<KeyValuePair<string, StringValues>>.Count => Inner.Count;
-
-        bool ICollection<KeyValuePair<string, StringValues>>.IsReadOnly => Inner.IsReadOnly;
-
-        ICollection<string> IDictionary<string, StringValues>.Keys => Inner.Keys;
-
-        ICollection<StringValues> IDictionary<string, StringValues>.Values => Inner.Values.Select(Convert).ToList();
-
-        void ICollection<KeyValuePair<string, StringValues>>.Add(KeyValuePair<string, StringValues> item) => Inner.Add(Convert(item));
-
-        void IDictionary<string, StringValues>.Add(string key, StringValues value) => Inner.Add(key, value);
-
-        void ICollection<KeyValuePair<string, StringValues>>.Clear() => Inner.Clear();
-
-        bool ICollection<KeyValuePair<string, StringValues>>.Contains(KeyValuePair<string, StringValues> item) => Inner.Contains(Convert(item));
-
-        bool IDictionary<string, StringValues>.ContainsKey(string key) => Inner.ContainsKey(key);
-
-        void ICollection<KeyValuePair<string, StringValues>>.CopyTo(KeyValuePair<string, StringValues>[] array, int arrayIndex)
-        {
-            foreach (var kv in Inner)
-            {
-                array[arrayIndex++] = Convert(kv);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => Inner.Select(Convert).GetEnumerator();
-
-        IEnumerator<KeyValuePair<string, StringValues>> IEnumerable<KeyValuePair<string, StringValues>>.GetEnumerator() => Inner.Select(Convert).GetEnumerator();
-
-        bool ICollection<KeyValuePair<string, StringValues>>.Remove(KeyValuePair<string, StringValues> item) => Inner.Remove(Convert(item));
-
-        bool IDictionary<string, StringValues>.Remove(string key) => Inner.Remove(key);
-
-        bool IDictionary<string, StringValues>.TryGetValue(string key, out StringValues value)
-        {
-            string[] temp;
-            if (Inner.TryGetValue(key, out temp))
-            {
-                value = temp;
-                return true;
-            }
-            value = default(StringValues);
-            return false;
-        }
-    }
-
-    internal class DictionaryStringArrayWrapper : IDictionary<string, string[]>
-    {
-        public DictionaryStringArrayWrapper(IHeaderDictionary inner)
-        {
-            Inner = inner;
-        }
-
-        public readonly IHeaderDictionary Inner;
-
-        private KeyValuePair<string, StringValues> Convert(KeyValuePair<string, string[]> item) => new KeyValuePair<string, StringValues>(item.Key, item.Value);
-
-        private KeyValuePair<string, string[]> Convert(KeyValuePair<string, StringValues> item) => new KeyValuePair<string, string[]>(item.Key, item.Value);
-
-        private StringValues Convert(string[] item) => item;
-
-        private string[] Convert(StringValues item) => item;
-
-        string[] IDictionary<string, string[]>.this[string key]
-        {
-            get { return ((IDictionary<string, StringValues>)Inner)[key]; }
-            set { Inner[key] = value; }
-        }
-
-        int ICollection<KeyValuePair<string, string[]>>.Count => Inner.Count;
-
-        bool ICollection<KeyValuePair<string, string[]>>.IsReadOnly => Inner.IsReadOnly;
-
-        ICollection<string> IDictionary<string, string[]>.Keys => Inner.Keys;
-
-        ICollection<string[]> IDictionary<string, string[]>.Values => Inner.Values.Select(Convert).ToList();
-
-        void ICollection<KeyValuePair<string, string[]>>.Add(KeyValuePair<string, string[]> item) => Inner.Add(Convert(item));
-
-        void IDictionary<string, string[]>.Add(string key, string[] value) => Inner.Add(key, value);
-
-        void ICollection<KeyValuePair<string, string[]>>.Clear() => Inner.Clear();
-
-        bool ICollection<KeyValuePair<string, string[]>>.Contains(KeyValuePair<string, string[]> item) => Inner.Contains(Convert(item));
-
-        bool IDictionary<string, string[]>.ContainsKey(string key) => Inner.ContainsKey(key);
-
-        void ICollection<KeyValuePair<string, string[]>>.CopyTo(KeyValuePair<string, string[]>[] array, int arrayIndex)
-        {
-            foreach (var kv in Inner)
-            {
-                array[arrayIndex++] = Convert(kv);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => Inner.Select(Convert).GetEnumerator();
-
-        IEnumerator<KeyValuePair<string, string[]>> IEnumerable<KeyValuePair<string, string[]>>.GetEnumerator() => Inner.Select(Convert).GetEnumerator();
-
-        bool ICollection<KeyValuePair<string, string[]>>.Remove(KeyValuePair<string, string[]> item) => Inner.Remove(Convert(item));
-
-        bool IDictionary<string, string[]>.Remove(string key) => Inner.Remove(key);
-
-        bool IDictionary<string, string[]>.TryGetValue(string key, out string[] value)
-        {
-            StringValues temp;
-            if (Inner.TryGetValue(key, out temp))
-            {
-                value = temp;
-                return true;
-            }
-            value = default(StringValues);
-            return false;
         }
     }
 
