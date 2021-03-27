@@ -28,6 +28,12 @@ namespace CefSharp.AspNetCore.Mvc
         IHttpRequestIdentifierFeature,
         IOwinEnvironmentFeature
     {
+        private const string RemoteIpAddress = "server.RemoteIpAddress";
+        private const string RemotePort = "server.RemotePort";
+        private const string LocalIpAddress = "server.LocalIpAddress";
+        private const string LocalPort = "server.LocalPort";
+        private const string ConnectionId = "server.ConnectionId";
+
         /// <summary>
         /// Gets or sets OWIN environment values.
         /// </summary>
@@ -195,32 +201,32 @@ namespace CefSharp.AspNetCore.Mvc
 
         IPAddress IHttpConnectionFeature.RemoteIpAddress
         {
-            get { return IPAddress.Parse(Prop<string>(CommonKeys.RemoteIpAddress)); }
-            set { Prop(CommonKeys.RemoteIpAddress, value.ToString()); }
+            get { return IPAddress.Parse(Prop<string>(RemoteIpAddress)); }
+            set { Prop(RemoteIpAddress, value.ToString()); }
         }
 
         IPAddress IHttpConnectionFeature.LocalIpAddress
         {
-            get { return IPAddress.Parse(Prop<string>(CommonKeys.LocalIpAddress)); }
-            set { Prop(CommonKeys.LocalIpAddress, value.ToString()); }
+            get { return IPAddress.Parse(Prop<string>(LocalIpAddress)); }
+            set { Prop(LocalIpAddress, value.ToString()); }
         }
 
         int IHttpConnectionFeature.RemotePort
         {
-            get { return int.Parse(Prop<string>(CommonKeys.RemotePort), CultureInfo.InvariantCulture); }
-            set { Prop(CommonKeys.RemotePort, value.ToString(CultureInfo.InvariantCulture)); }
+            get { return int.Parse(Prop<string>(RemotePort), CultureInfo.InvariantCulture); }
+            set { Prop(RemotePort, value.ToString(CultureInfo.InvariantCulture)); }
         }
 
         int IHttpConnectionFeature.LocalPort
         {
-            get { return int.Parse(Prop<string>(CommonKeys.LocalPort), CultureInfo.InvariantCulture); }
-            set { Prop(CommonKeys.LocalPort, value.ToString(CultureInfo.InvariantCulture)); }
+            get { return int.Parse(Prop<string>(LocalPort), CultureInfo.InvariantCulture); }
+            set { Prop(LocalPort, value.ToString(CultureInfo.InvariantCulture)); }
         }
 
         string IHttpConnectionFeature.ConnectionId
         {
-            get { return Prop<string>(CommonKeys.ConnectionId); }
-            set { Prop(CommonKeys.ConnectionId, value); }
+            get { return Prop<string>(ConnectionId); }
+            set { Prop(ConnectionId, value); }
         }
 
         Task IHttpResponseBodyFeature.SendFileAsync(string path, long offset, long? length, CancellationToken cancellation)
@@ -290,19 +296,6 @@ namespace CefSharp.AspNetCore.Mvc
             }
             return new DictionaryStringArrayWrapper(dictionary);
         }
-    }
-
-    internal static class CommonKeys
-    {
-        public const string RemoteIpAddress = "server.RemoteIpAddress";
-        public const string RemotePort = "server.RemotePort";
-        public const string LocalIpAddress = "server.LocalIpAddress";
-        public const string LocalPort = "server.LocalPort";
-        public const string ConnectionId = "server.ConnectionId";
-        public const string Scheme = "scheme";
-        public const string Host = "host";
-        public const string Port = "port";
-        public const string Path = "path";
     }
 }
 
