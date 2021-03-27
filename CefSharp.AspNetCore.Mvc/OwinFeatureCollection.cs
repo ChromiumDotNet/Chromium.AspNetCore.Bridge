@@ -16,7 +16,6 @@ namespace CefSharp.AspNetCore.Mvc
             Set<IHttpRequestFeature>(owin);
             Set<IHttpResponseFeature> (owin);
             Set<IHttpResponseBodyFeature> (owin);
-            Set<IHttpConnectionFeature> (owin);
             Set<IHttpRequestIdentifierFeature> (owin);
             Set<IOwinEnvironmentFeature>(owin);
         }

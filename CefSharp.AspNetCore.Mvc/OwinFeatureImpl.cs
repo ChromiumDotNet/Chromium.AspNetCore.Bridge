@@ -3,10 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.IO.Pipelines;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CefSharp.AspNetCore.Mvc.Owin;
@@ -24,16 +22,9 @@ namespace CefSharp.AspNetCore.Mvc
         IHttpRequestFeature,
         IHttpResponseFeature,
         IHttpResponseBodyFeature,
-        IHttpConnectionFeature,
         IHttpRequestIdentifierFeature,
         IOwinEnvironmentFeature
     {
-        private const string RemoteIpAddress = "server.RemoteIpAddress";
-        private const string RemotePort = "server.RemotePort";
-        private const string LocalIpAddress = "server.LocalIpAddress";
-        private const string LocalPort = "server.LocalPort";
-        private const string ConnectionId = "server.ConnectionId";
-
         /// <summary>
         /// Gets or sets OWIN environment values.
         /// </summary>
@@ -197,36 +188,6 @@ namespace CefSharp.AspNetCore.Mvc
         void IHttpResponseFeature.OnCompleted(Func<object, Task> callback, object state)
         {
             
-        }
-
-        IPAddress IHttpConnectionFeature.RemoteIpAddress
-        {
-            get { return IPAddress.Parse(Prop<string>(RemoteIpAddress)); }
-            set { Prop(RemoteIpAddress, value.ToString()); }
-        }
-
-        IPAddress IHttpConnectionFeature.LocalIpAddress
-        {
-            get { return IPAddress.Parse(Prop<string>(LocalIpAddress)); }
-            set { Prop(LocalIpAddress, value.ToString()); }
-        }
-
-        int IHttpConnectionFeature.RemotePort
-        {
-            get { return int.Parse(Prop<string>(RemotePort), CultureInfo.InvariantCulture); }
-            set { Prop(RemotePort, value.ToString(CultureInfo.InvariantCulture)); }
-        }
-
-        int IHttpConnectionFeature.LocalPort
-        {
-            get { return int.Parse(Prop<string>(LocalPort), CultureInfo.InvariantCulture); }
-            set { Prop(LocalPort, value.ToString(CultureInfo.InvariantCulture)); }
-        }
-
-        string IHttpConnectionFeature.ConnectionId
-        {
-            get { return Prop<string>(ConnectionId); }
-            set { Prop(ConnectionId, value); }
         }
 
         Task IHttpResponseBodyFeature.SendFileAsync(string path, long offset, long? length, CancellationToken cancellation)
