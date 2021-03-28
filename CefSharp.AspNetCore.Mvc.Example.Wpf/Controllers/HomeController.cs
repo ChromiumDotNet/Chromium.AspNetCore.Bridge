@@ -1,4 +1,5 @@
 ﻿using CefSharp.AspNetCore.Mvc.Example.Wpf.Models;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -8,6 +9,9 @@ namespace CefSharp.AspNetCore.Mvc.Example.Wpf.Controllers
     {
         public ActionResult Index()
         {
+            //Get Access to the OWIN Environment, we can potentially look at adding access to the ChromiumWebBrowser
+            //var owinEnvironmentFeature = HttpContext.Features.Get<Microsoft.AspNetCore.Owin.IOwinEnvironmentFeature>();
+
             var model = new HomeViewModel
             {
                 Text = "Welcome",
@@ -35,6 +39,9 @@ namespace CefSharp.AspNetCore.Mvc.Example.Wpf.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            var exception = context.Error; // Your exception
+
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
