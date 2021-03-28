@@ -39,8 +39,17 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
         {
             var deferral = e.GetDeferral();
 
+            var requestStream = Stream.Null;
             var responseStream = new MemoryStream();
-            var requestBody = Stream.Null;
+
+            //Take a copy of our stream, otherwise getting a Read Error from the COM Stream wrapper
+            //We need a seekable stream and the COM Stream wrapper isn't
+            if (e.Request.Content != null)
+            {
+                requestStream = new MemoryStream();
+                e.Request.Content.CopyTo(requestStream);
+                requestStream.Position = 0;
+            }
 
             var uri = new Uri(e.Request.Uri);
             var requestHeaders = ToDictionary(e.Request.Headers);
@@ -54,7 +63,7 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
             var owinEnvironment = new Dictionary<string, object>(StringComparer.Ordinal)
             {
                 //Request http://owin.org/html/owin.html#3-2-1-request-data
-                {"owin.RequestBody", requestBody},
+                {"owin.RequestBody", requestStream},
                 {"owin.RequestHeaders", requestHeaders},
                 {"owin.RequestMethod", e.Request.Method},
                 {"owin.RequestPath", uri.AbsolutePath},
@@ -76,7 +85,7 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
             responseStream.Position = 0;
 
             int statusCode;
-            string reasonPhrase;
+            string reasonPhrase = null;
 
             if (owinEnvironment.ContainsKey("owin.ResponseStatusCode"))
             {
@@ -89,12 +98,13 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
 
             if (owinEnvironment.ContainsKey("owin.ResponseReasonPhrase"))
             {
-                reasonPhrase = owinEnvironment["owin.ResponseReasonPhrase"].ToString();
+                reasonPhrase = owinEnvironment["owin.ResponseReasonPhrase"] as string;
             }
-            else
+
+            if(string.IsNullOrEmpty(reasonPhrase))
             {
                 reasonPhrase = "OK";
-            }
+            }            
 
             //Grab a reference to the ResponseHeaders
             var responseHeaders = (Dictionary<string, string[]>)owinEnvironment["owin.ResponseHeaders"];

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Extensions.Logging;
 
 namespace WebView2.AspNetCore.Mvc.Example.Wpf
 {
@@ -31,6 +32,8 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
         {
             base.OnStartup(e);
 
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+
             _ = Task.Run(async () =>
               {
                   var builder = new WebHostBuilder();
@@ -44,6 +47,11 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
                       });
 
                       services.AddSingleton<IServer>(server);
+                  });
+
+                  builder.ConfigureLogging(logging =>
+                  {
+                      logging.AddConsole();
                   });
 
                   _host = builder
