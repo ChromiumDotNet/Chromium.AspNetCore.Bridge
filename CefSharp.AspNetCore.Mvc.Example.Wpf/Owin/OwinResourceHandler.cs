@@ -9,7 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace CefSharp.AspNetCore.Mvc
+namespace CefSharp.AspNetCore.Mvc.Example.Wpf.Owin
 {
     //Shorthand for Owin pipeline func
     using AppFunc = Func<IDictionary<string, object>, Task>;

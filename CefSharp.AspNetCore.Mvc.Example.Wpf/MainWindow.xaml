@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CefSharp.AspNetCore.Mvc.Example.Wpf"
         xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="U" Command="{Binding Path=ViewSourceCommand, ElementName=Browser}" />
     </Window.InputBindings>
