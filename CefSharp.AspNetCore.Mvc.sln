@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CefSharp.AspNetCore.Mvc.Exa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebView2.AspNetCore.Mvc.Example.Wpf", "WebView2.AspNetCore.Mvc.Example.Wpf\WebView2.AspNetCore.Mvc.Example.Wpf.csproj", "{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chromely.AspNetCore.Mvc.Example", "Chromely.AspNetCore.Mvc.Example\Chromely.AspNetCore.Mvc.Example.csproj", "{CFCD8EC9-D3A1-4999-A9F5-7E52846A8D2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62BC88D7-81C2-4F16-8291-B729BE5EA9BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFCD8EC9-D3A1-4999-A9F5-7E52846A8D2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFCD8EC9-D3A1-4999-A9F5-7E52846A8D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFCD8EC9-D3A1-4999-A9F5-7E52846A8D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFCD8EC9-D3A1-4999-A9F5-7E52846A8D2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
