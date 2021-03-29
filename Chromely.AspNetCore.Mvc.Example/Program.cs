@@ -8,9 +8,8 @@ using CefSharp.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
-using Chromely.Core.Network;
-using Xilium.CefGlue;
-using Chromely.AspNetCore.Mvc.Example.Owin;
+using System.Linq;
+
 
 namespace Chromely.AspNetCore.Mvc.Example
 {
@@ -26,33 +25,43 @@ namespace Chromely.AspNetCore.Mvc.Example
         [STAThread]
         public static async Task Main(string[] args)
         {
-            var tcs = new TaskCompletionSource<AppFunc>();
+            AppFunc appFunc = null;
 
-            var builder = new WebHostBuilder();
-
-            builder.ConfigureServices(services =>
+            //Only setup our AspNet Core host if within the Browser Process
+            //Not needed for the sub processes (render, gpu, etc)
+            //TODO: Move this somewhere internal to Chromely that
+            //doesn't require the extra check and supports async
+            if (!args.Any(x => x.StartsWith("--type")))
             {
-                var server = new OwinServer();
-                server.UseOwin(appFunc =>
+                var tcs = new TaskCompletionSource<AppFunc>();
+
+                var builder = new WebHostBuilder();
+
+                builder.ConfigureServices(services =>
                 {
-                    tcs.SetResult(appFunc);
+                    var server = new OwinServer();
+                    server.UseOwin(appFunc =>
+                    {
+                        tcs.SetResult(appFunc);
+                    });
+
+                    services.AddSingleton<IServer>(server);
                 });
 
-                services.AddSingleton<IServer>(server);
-            });
+                _host = builder
+                    .UseStartup<Startup>()
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .Build();
 
-            _host = builder
-                .UseStartup<Startup>()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .Build();
+                _ = _host.RunAsync();
 
-            _ = _host.RunAsync();
-
-            var appFunc = await tcs.Task;
+                appFunc = await tcs.Task;
+            }
 
             var config = DefaultConfiguration.CreateForRuntimePlatform();
             config.WindowOptions.Title = "Title Window";
-            config.StartUrl = "https://chromely.test";
+            //config.StartUrl = "https://chromely.test";
+            config.StartUrl = "chrome://version";
 
             var app = new OwinChromelyBasicApp(appFunc);
 
