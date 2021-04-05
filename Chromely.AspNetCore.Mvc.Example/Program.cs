@@ -60,8 +60,8 @@ namespace Chromely.AspNetCore.Mvc.Example
 
             var config = DefaultConfiguration.CreateForRuntimePlatform();
             config.WindowOptions.Title = "Title Window";
-            //config.StartUrl = "https://chromely.test";
-            config.StartUrl = "chrome://version";
+            config.StartUrl = "https://chromely.test";
+            //config.StartUrl = "chrome://version";
 
             var app = new OwinChromelyBasicApp(appFunc);
 
