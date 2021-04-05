@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Chromely.Core;
 using Chromely.Core.Configuration;
 using Microsoft.AspNetCore.Hosting;
-using CefSharp.AspNetCore.Mvc;
+using CefSharp.AspNetCore.Host;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;

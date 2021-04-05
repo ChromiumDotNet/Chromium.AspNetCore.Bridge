@@ -7,12 +7,12 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
-using CefSharp.AspNetCore.Mvc.Owin;
+using CefSharp.AspNetCore.Host.Owin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Owin;
 
-namespace CefSharp.AspNetCore.Mvc
+namespace CefSharp.AspNetCore.Host
 {
     /// <summary>
     /// CefSharp OWIN feature collection.

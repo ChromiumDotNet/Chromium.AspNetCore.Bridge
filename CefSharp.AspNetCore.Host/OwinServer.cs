@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CefSharp.AspNetCore.Mvc
+namespace CefSharp.AspNetCore.Host
 {
     //Shorthand for Owin pipeline func
     using AppFunc = Func<IDictionary<string, object>, Task>;

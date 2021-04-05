@@ -1,4 +1,4 @@
-﻿using CefSharp.AspNetCore.Mvc;
+﻿using CefSharp.AspNetCore.Host;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;

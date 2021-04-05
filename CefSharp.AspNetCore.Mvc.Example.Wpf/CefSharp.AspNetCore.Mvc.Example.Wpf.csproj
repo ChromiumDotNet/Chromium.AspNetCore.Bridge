@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CefSharp.AspNetCore.Mvc\CefSharp.AspNetCore.Mvc.csproj" />
+    <ProjectReference Include="..\CefSharp.AspNetCore.Host\CefSharp.AspNetCore.Host.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Owin;
 using System.Collections.Generic;
 
-namespace CefSharp.AspNetCore.Mvc
+namespace CefSharp.AspNetCore.Host
 {
     public class OwinFeatureCollection : FeatureCollection
     {
