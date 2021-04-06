@@ -1,5 +1,4 @@
 ﻿using CefSharp.AspNetCore.Host;
-using CefSharp.AspNetCore.Mvc.Example.Wpf.Owin;
 using CefSharp.Wpf;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
