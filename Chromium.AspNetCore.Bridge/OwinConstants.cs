@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Originally from https://github.com/dotnet/aspnetcore/blob/c925f99cddac0df90ed0bc4a07ecda6b054a0b02/src/Http/Owin/src/OwinConstants.cs
 
-namespace CefSharp.AspNetCore.Host.Owin
+namespace Chromium.AspNetCore.Bridge
 {
     public static class OwinConstants
     {

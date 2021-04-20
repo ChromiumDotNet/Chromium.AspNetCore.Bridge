@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Owin;
 using System.Collections.Generic;
 
-namespace CefSharp.AspNetCore.Host
+namespace Chromium.AspNetCore.Bridge
 {
     public class OwinFeatureCollection : FeatureCollection
     {

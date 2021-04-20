@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Version>0.9.0</Version>
+    <Authors>Alex Maitland</Authors>
+    <Description>Chromium AspNet Core Bridge</Description>
+    <Copyright>Copyright © Alex Maitland</Copyright>
+    <RepositoryUrl>https://github.com/amaitland/Chromium.AspNetCore.Bridge/</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/amaitland/Chromium.AspNetCore.Bridge/</PackageProjectUrl>
+ </PropertyGroup>
+</Project>

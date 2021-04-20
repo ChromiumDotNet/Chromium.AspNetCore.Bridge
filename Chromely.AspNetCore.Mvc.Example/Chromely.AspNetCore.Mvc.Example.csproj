@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CefSharp.AspNetCore.Host\CefSharp.AspNetCore.Host.csproj" />
+    <ProjectReference Include="..\Chromium.AspNetCore.Bridge\Chromium.AspNetCore.Bridge.csproj" />
   </ItemGroup>
 
   <ItemGroup>

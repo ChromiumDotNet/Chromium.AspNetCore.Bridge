@@ -8,8 +8,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
-
-namespace CefSharp.AspNetCore.Host.Owin
+namespace Microsoft.AspNetCore.Owin
 {
     internal class DictionaryStringArrayWrapper : IDictionary<string, string[]>
     {

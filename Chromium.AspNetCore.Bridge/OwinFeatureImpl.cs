@@ -7,12 +7,11 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
-using CefSharp.AspNetCore.Host.Owin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Owin;
 
-namespace CefSharp.AspNetCore.Host
+namespace Chromium.AspNetCore.Bridge
 {
     /// <summary>
     /// CefSharp OWIN feature collection.

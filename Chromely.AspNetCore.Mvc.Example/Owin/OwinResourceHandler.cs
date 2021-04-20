@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Alex Maitland. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Chromium.AspNetCore.Bridge;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -37,7 +37,7 @@ namespace Chromely.AspNetCore.Mvc.Example.Owin
         }
 
         /// <summary>
-        /// Read the request, then process it through the OWEN pipeline
+        /// Read the request, then process it through the OWIN pipeline
         /// then populate the response properties.
         /// </summary>
         /// <param name="request">request</param>
@@ -45,10 +45,6 @@ namespace Chromely.AspNetCore.Mvc.Example.Owin
         /// <returns>always returns true as we'll handle all requests this handler is registered for.</returns>
         public override CefReturnValue ProcessRequestAsync(CefRequest request, CefCallback callback)
         {
-            // PART 1 - Read the request - here we read the request and create a dictionary
-            // that follows the OWEN standard
-
-            var responseStream = new MemoryStream();
             var requestBody = Stream.Null;
 
             if (request.Method == "POST")
@@ -78,75 +74,31 @@ namespace Chromely.AspNetCore.Mvc.Example.Owin
                 }
             }
 
-            //TODO: Implement cancellation token
-            //var cancellationTokenSource = new CancellationTokenSource();
-            //var cancellationToken = cancellationTokenSource.Token;
             var uri = new Uri(request.Url);
-            var requestHeaders = ToDictionary(request.GetHeaderMap());
+            var requestHeaders = request.GetHeaderMap();
             //Add Host header as per http://owin.org/html/owin.html#5-2-hostname
-            requestHeaders.Add("Host", new[] { uri.Host + (uri.Port > 0 ? (":" + uri.Port) : "") });
+            requestHeaders.Add("Host", uri.Host + (uri.Port > 0 ? (":" + uri.Port) : ""));
 
-            //http://owin.org/html/owin.html#3-2-environment
-            //The Environment dictionary stores information about the request,
-            //the response, and any relevant server state.
-            //The server is responsible for providing body streams and header collections for both the request and response in the initial call.
-            //The application then populates the appropriate fields with response data, writes the response body, and returns when done.
-            //Keys MUST be compared using StringComparer.Ordinal.
-            var owinEnvironment = new Dictionary<string, object>(StringComparer.Ordinal)
-            {
-                //Request http://owin.org/html/owin.html#3-2-1-request-data
-                {"owin.RequestBody", requestBody},
-                {"owin.RequestHeaders", requestHeaders},
-                {"owin.RequestMethod", request.Method},
-                {"owin.RequestPath", uri.AbsolutePath},
-                {"owin.RequestPathBase", "/"},
-                {"owin.RequestProtocol", "HTTP/1.1"},
-                {"owin.RequestQueryString", uri.Query},
-                {"owin.RequestScheme", uri.Scheme},
-                //Response http://owin.org/html/owin.html#3-2-2-response-data
-                {"owin.ResponseHeaders", new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)},
-                {"owin.ResponseBody", responseStream},
-                //Other Data
-                {"owin.Version", "1.0.0"},
-                //{"owin.CallCancelled", cancellationToken}
-            };
+            var owinRequest = new ResourceRequest(request.Url, request.Method, requestHeaders, requestBody);
 
             //PART 2 - Spawn a new task to execute the OWIN pipeline
             //We execute this in an async fashion and return true so other processing
             //can occur
             Task.Run(async () =>
             {
-                //Call into the OWEN pipeline
                 try
                 {
-                    await _appFunc(owinEnvironment);
-
-                    //Response has been populated - reset the position to 0 so it can be read
-                    responseStream.Position = 0;
-
-                    int statusCode;
-
-                    if (owinEnvironment.ContainsKey("owin.ResponseStatusCode"))
-                    {
-                        statusCode = Convert.ToInt32(owinEnvironment["owin.ResponseStatusCode"]);
-                        //TODO: Improve status code mapping - see if CEF has a helper function that can be exposed
-                        //StatusText = StatusCodeToStatusTextMapping[response.StatusCode];
-                    }
-                    else
-                    {
-                        statusCode = (int)HttpStatusCode.OK;
-                        //StatusText = "OK";
-                    }
-
-                    //Grab a reference to the ResponseHeaders
-                    var responseHeaders = (Dictionary<string, string[]>)owinEnvironment["owin.ResponseHeaders"];
+                    //Call into the OWIN pipeline
+                    var owinResponse = await RequestInterceptor.ProcessRequest(_appFunc, owinRequest);
 
                     //Populate the response properties
-                    Stream = responseStream;
-                    ResponseLength = responseStream.Length;
-                    StatusCode = statusCode;
+                    Stream = owinResponse.Stream;
+                    ResponseLength = owinResponse.Stream.Length;
+                    StatusCode = owinResponse.StatusCode;
 
-                    if(responseHeaders.ContainsKey("Content-Type"))
+                    var responseHeaders = owinResponse.Headers;
+
+                    if (responseHeaders.ContainsKey("Content-Type"))
                     {
                         var contentType = responseHeaders["Content-Type"].First();
                         MimeType = contentType.Split(';').First();
@@ -156,7 +108,7 @@ namespace Chromely.AspNetCore.Mvc.Example.Owin
                         MimeType = DefaultMimeType;
                     }                    
 
-                    //Add the response headers from OWEN to the Headers NameValueCollection
+                    //Add the response headers from OWIN to the Headers NameValueCollection
                     foreach (var responseHeader in responseHeaders)
                     {
                         //It's possible for headers to have multiple values
@@ -188,30 +140,6 @@ namespace Chromely.AspNetCore.Mvc.Example.Owin
             });
 
             return CefReturnValue.ContinueAsync;
-        }
-
-        private static IDictionary<string, string[]> ToDictionary(NameValueCollection nameValueCollection)
-        {
-            var dict = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-            foreach (var key in nameValueCollection.AllKeys)
-            {
-                if (!dict.ContainsKey(key))
-                {
-                    dict.Add(key, new string[0]);
-                }
-                var strings = nameValueCollection.GetValues(key);
-                if (strings == null)
-                {
-                    continue;
-                }
-                foreach (string value in strings)
-                {
-                    var values = dict[key].ToList();
-                    values.Add(value);
-                    dict[key] = values.ToArray();
-                }
-            }
-            return dict;
         }
     }
 }

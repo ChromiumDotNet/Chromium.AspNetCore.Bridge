@@ -1,4 +1,4 @@
-﻿using CefSharp.AspNetCore.Host;
+﻿using Chromium.AspNetCore.Bridge;
 using CefSharp.Wpf;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -20,8 +20,10 @@ namespace CefSharp.AspNetCore.Mvc.Example.Wpf
         {
             base.OnStartup(e);
 
-            var settings = new CefSettings();
-            settings.CachePath = Path.Combine(Path.GetDirectoryName(typeof(App).Assembly.Location), "cache");
+            var settings = new CefSettings
+            {
+                CachePath = Path.Combine(Path.GetDirectoryName(typeof(App).Assembly.Location), "cache")
+            };
             Cef.Initialize(settings);
 
             _ = Task.Run(async () =>

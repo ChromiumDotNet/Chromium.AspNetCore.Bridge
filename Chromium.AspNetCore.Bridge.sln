@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CefSharp.AspNetCore.Host", "CefSharp.AspNetCore.Host\CefSharp.AspNetCore.Host.csproj", "{9AD08B47-B8C3-40CF-847B-885AD09A105D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chromium.AspNetCore.Bridge", "Chromium.AspNetCore.Bridge\Chromium.AspNetCore.Bridge.csproj", "{9AD08B47-B8C3-40CF-847B-885AD09A105D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CefSharp.AspNetCore.Mvc.Example.Wpf", "CefSharp.AspNetCore.Mvc.Example.Wpf\CefSharp.AspNetCore.Mvc.Example.Wpf.csproj", "{0F38BEF1-0A3D-4DFD-B0F6-02386DED78B9}"
 EndProject

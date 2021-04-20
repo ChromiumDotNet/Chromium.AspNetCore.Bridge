@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 
-namespace CefSharp.AspNetCore.Host.Owin
+namespace Microsoft.AspNetCore.Owin
 {
     internal class DictionaryStringValuesWrapper : IHeaderDictionary
     {
