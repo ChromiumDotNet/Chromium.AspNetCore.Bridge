@@ -60,7 +60,7 @@ namespace Chromium.AspNetCore.Bridge
                 //It's possible for headers to have multiple values
                 foreach (var val in header.Value)
                 {
-                    responseHeaders.AppendLine(header.Key + "=" + val);
+                    responseHeaders.AppendLine(header.Key + ":" + val);
                 }
             }
 

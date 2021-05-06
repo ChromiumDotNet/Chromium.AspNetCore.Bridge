@@ -33,6 +33,11 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
             return View();
         }
 
+        public IActionResult RedirectToPrivacy()
+        {
+            return RedirectToAction(nameof(Privacy));
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
