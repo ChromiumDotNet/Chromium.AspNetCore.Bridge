@@ -19,7 +19,7 @@ configuration: Release
 
 # scripts to run before build
 before_build:
-  dotnet restore
+  dotnet restore Chromium.AspNetCore.Bridge.AppVeyor.sln
 
 build:
   project: Chromium.AspNetCore.Bridge.AppVeyor.sln
