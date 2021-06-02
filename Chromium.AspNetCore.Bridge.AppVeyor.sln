@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chromium.AspNetCore.Bridge", "Chromium.AspNetCore.Bridge\Chromium.AspNetCore.Bridge.csproj", "{9AD08B47-B8C3-40CF-847B-885AD09A105D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9AD08B47-B8C3-40CF-847B-885AD09A105D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AD08B47-B8C3-40CF-847B-885AD09A105D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AD08B47-B8C3-40CF-847B-885AD09A105D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AD08B47-B8C3-40CF-847B-885AD09A105D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6834AF3E-A636-4B77-B5DD-F8E6085305A2}
+	EndGlobalSection
+EndGlobal

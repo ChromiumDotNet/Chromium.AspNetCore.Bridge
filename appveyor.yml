@@ -22,7 +22,7 @@ before_build:
   dotnet restore
 
 build:
-  project: Chromium.AspNetCore.Bridge\Chromium.AspNetCore.Bridge.csproj
+  project: Chromium.AspNetCore.Bridge.AppVeyor.sln
   # MSBuild verbosity level
   verbosity: normal
 
