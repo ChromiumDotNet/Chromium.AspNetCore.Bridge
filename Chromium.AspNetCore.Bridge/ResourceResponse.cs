@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Alex Maitland. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace Chromium.AspNetCore.Bridge
 {
+    /// <summary>
+    /// Resource Response - Represents a basic response, StatusCode, Headers, Stream etc
+    /// </summary>
     public class ResourceResponse
     {
         /// <summary>

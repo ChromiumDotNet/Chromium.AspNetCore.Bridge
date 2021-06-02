@@ -13,6 +13,10 @@ namespace Chromium.AspNetCore.Bridge
     //Shorthand for Owin pipeline func
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// An <see cref="IServer"/> implementation that allows for using an OWIN pipeline
+    /// for fulfilling requests/responses.
+    /// </summary>
     public class OwinServer : IServer
     {
         private IFeatureCollection _features = new FeatureCollection();
@@ -28,6 +32,11 @@ namespace Chromium.AspNetCore.Bridge
             
         }
 
+        /// <summary>
+        /// The <paramref name="action"/> will be called when the OWIN <see cref="AppFunc"/> 
+        /// is ready for use. 
+        /// </summary>
+        /// <param name="action">called when OWIN <see cref="AppFunc"/> is ready for use.</param>
         public void UseOwin(Action<AppFunc> action)
         {
             useOwin = action;

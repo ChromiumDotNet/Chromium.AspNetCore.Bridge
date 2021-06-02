@@ -11,6 +11,9 @@ namespace Chromium.AspNetCore.Bridge
     //Shorthand for Owin pipeline func
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
+    /// <summary>
+    /// RequestInterceptor provides common functions for executing an OWIN <see cref="AppFunc"/>
+    /// </summary>
     public static class RequestInterceptor
     {
         /// <summary>
