@@ -1,6 +1,6 @@
 image: Visual Studio 2019
 
-version: 1.0.1-CI{build}
+version: 1.0.2-CI{build}
 
 clone_depth: 10
 
@@ -35,7 +35,7 @@ deploy:
   provider: NuGet
   server: https://www.myget.org/F/cefsharp/api/v2/package
   api_key:
-    secure: 0n8fBcKO0lP1h8ko2++D1NeAqH5nLdyjvvvlcL3Y7FxtBtJ+MEDKe2RS3usFdE2h
+    secure: XR2LM25h8XW2uAjgQL5o4bUpMVL2NXWF7019HhMiMftP/Ip8UH4pp+hi+OUYMhfE
   skip_symbols: false
   symbol_server: https://www.myget.org/F/cefsharp/api/v2/package
   artifact: nupkgfiles
