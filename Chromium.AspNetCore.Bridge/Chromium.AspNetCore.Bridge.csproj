@@ -6,14 +6,19 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <EmbedAllSources>true</EmbedAllSources>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Alex Maitland</Authors>
     <Description>Chromium based browsers (CefSharp, CefGlue, WebView2 etc) can directly integrate AspNetCore into the browser without having to make network requests.</Description>
     <Copyright>Copyright © Alex Maitland</Copyright>
+    <PackageReleaseNotes>
+      Sign assembly.
+    </PackageReleaseNotes>
     <RepositoryUrl>https://github.com/amaitland/Chromium.AspNetCore.Bridge</RepositoryUrl>
     <PackageProjectUrl>https://github.com/amaitland/Chromium.AspNetCore.Bridge</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Chromium.AspNetCore.Bridge.xml</DocumentationFile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Chromium.AspNetCore.Bridge.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
