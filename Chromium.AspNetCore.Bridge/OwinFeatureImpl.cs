@@ -32,6 +32,13 @@ namespace Chromium.AspNetCore.Bridge
         private IHeaderDictionary _requestHeaders;
         private IHeaderDictionary _responseHeaders;
 
+        //--> Added the Func Task's ability to capture callbacks from OnStarting/OnComplete Middleware
+        private Func<Task> _responseStartingAsync = () => Task.CompletedTask;
+        private Func<Task> _responseCompletedAsync = () => Task.CompletedTask;
+        //-->
+
+        private bool _started;
+
         /// <summary>
         /// Initializes a new instance of <see cref="Microsoft.AspNetCore.Owin.OwinFeatureCollection"/>.
         /// </summary>
@@ -102,7 +109,7 @@ namespace Chromium.AspNetCore.Bridge
         {
             get
             {
-                if(_requestHeaders == null)
+                if (_requestHeaders == null)
                 {
                     var dict = GetEnvironmentPropertyOrDefault<IDictionary<string, string[]>>(OwinConstants.RequestHeaders);
                     _requestHeaders = dict is IHeaderDictionary ? (IHeaderDictionary)dict : new DictionaryStringValuesWrapper(dict);
@@ -174,19 +181,47 @@ namespace Chromium.AspNetCore.Bridge
             }
         }
 
-        bool IHttpResponseFeature.HasStarted
-        {
-            get { return false; }
-        }
+        bool IHttpResponseFeature.HasStarted => false;
 
         void IHttpResponseFeature.OnStarting(Func<object, Task> callback, object state)
         {
-            
+            //not protecting with HasStarted because is always false
+            //normaly OnStarting Execute before stream sent to client
+
+            //-> Disable below code then create simple Middleware with Onstarting/OnComplete,
+            //-> You will notice that all the OnStarting/OnComplete in the middleware will never be triggered 
+
+            var prior = _responseStartingAsync;
+            _responseStartingAsync = async () =>
+            {
+                await callback(state);
+                await prior();
+            };
+            //->
+
         }
 
         void IHttpResponseFeature.OnCompleted(Func<object, Task> callback, object state)
         {
-            
+
+            //not protecting with HasStarted because is always false
+
+            //-> Disable below code then create simple Middleware with Onstarting/OnComplete,
+            //-> You will notice that all the OnStarting/OnComplete in the middleware will never be triggered 
+
+            var prior = _responseCompletedAsync;
+            _responseCompletedAsync = async () =>
+            {
+                try
+                {
+                    await callback(state);
+                }
+                finally
+                {
+                    await prior();
+                }
+            };
+            //-> 
         }
 
         Task IHttpResponseBodyFeature.SendFileAsync(string path, long offset, long? length, CancellationToken cancellation)
@@ -200,25 +235,67 @@ namespace Chromium.AspNetCore.Bridge
         {
         }
 
+        async Task FireOnSendingHeadersAsync()
+        {
+
+            try
+            {
+                await _responseStartingAsync();
+            }
+            finally
+            {
+                //HasStarted = true;
+            }
+        }
+
+        Task FireOnResponseCompletedAsync()
+        {
+            return _responseCompletedAsync();
+        }
+
         async Task IHttpResponseBodyFeature.StartAsync(CancellationToken cancellationToken)
         {
+            try
+            {
+                _started = true;
+                await FireOnSendingHeadersAsync();
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
             if (_responseBodyWrapper != null)
             {
                 await _responseBodyWrapper.FlushAsync(cancellationToken);
             }
 
-            // The pipe may or may not have flushed the stream. Make sure the stream gets flushed to trigger response start.
+            //// The pipe may or may not have flushed the stream. Make sure the stream gets flushed to trigger response start.
             await GetEnvironmentPropertyOrDefault<Stream>(OwinConstants.ResponseBody).FlushAsync(cancellationToken);
+
+
         }
 
         Task IHttpResponseBodyFeature.CompleteAsync()
         {
-            if (_responseBodyWrapper != null)
+
+
+
+            if (!_started)
             {
-                return _responseBodyWrapper.FlushAsync().AsTask();
+                ((IHttpResponseBodyFeature)this).StartAsync().Wait();
             }
 
-            return Task.CompletedTask;
+            FireOnResponseCompletedAsync();
+
+            if (_responseBodyWrapper != null)
+            {
+                _responseBodyWrapper.FlushAsync().ConfigureAwait(false);
+            }
+
+
+            return ((IHttpResponseBodyFeature)this).Writer.CompleteAsync().AsTask();
         }
 
         /// <inheritdoc/>

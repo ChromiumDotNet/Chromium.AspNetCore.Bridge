@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Threading.Tasks;
+
 
 namespace WebView2.AspNetCore.Mvc.Example.Wpf
 {
@@ -19,6 +23,15 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddDistributedMemoryCache();
+            services.AddSession(opt =>
+            {
+                opt.Cookie.HttpOnly = true;
+                opt.Cookie.IsEssential = true;
+                opt.IdleTimeout = TimeSpan.FromHours(1);
+
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,6 +48,12 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
             
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthorization();
+            app.UseSession();
+
+
+            app.UseMiddleware<TestMiddleware>();
+
 
             app.UseEndpoints(endpoints =>
             {
@@ -43,6 +62,29 @@ namespace WebView2.AspNetCore.Mvc.Example.Wpf
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
+        }
+    }
+
+    // testing for invetigation purpose
+    public class TestMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public TestMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task InvokeAsync(HttpContext context)
+        {
+            context.Response.OnStarting(e => {
+                //disabled code in IHttpResopnseFeature.OnStarting and OnComplete (OwinFeatureImpl.cs)
+                //create break point here, 
+                return Task.CompletedTask;
+            }
+            , null);
+
+            await _next(context);
         }
     }
 }
