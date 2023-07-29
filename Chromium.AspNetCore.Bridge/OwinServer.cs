@@ -53,6 +53,7 @@ namespace Chromium.AspNetCore.Bridge
                 try
                 {
                     await application.ProcessRequestAsync(context);
+                    await features.Get<IHttpResponseBodyFeature>().StartAsync();
                 }
                 catch (Exception ex)
                 {
